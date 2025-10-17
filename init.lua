@@ -185,10 +185,10 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
 -- TIP: Disable arrow keys in normal mode
--- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
--- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
--- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
--- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
+vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
+vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
+vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
 -- Keybinds to make split navigation easier.
 --  Use CTRL+<hjkl> to switch between windows
@@ -435,7 +435,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader><leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
@@ -1011,6 +1011,110 @@ require('lazy').setup({
     },
   },
 })
+
+-- My keymaps
+-- Basics
+vim.keymap.set('i', 'jk', '<Esc>', { desc = 'Escape insert mode' })
+vim.keymap.set('c', 'jk', '<C-c>', { desc = 'Escape command' })
+vim.keymap.set('n', '<leader><leader>w', ':w<CR>', { desc = 'Write to file' })
+vim.keymap.set('n', '<leader><leader>q', ':q<CR>', { desc = 'Quit' })
+vim.keymap.set('t', '<C-n>', [[<C-\><C-n>]], { desc = 'Enter normal mode in terminal' })
+
+-- Allow window navigation from terminal mode with <C-h/j/k/l>
+vim.api.nvim_create_autocmd('TermOpen', {
+  pattern = '*',
+  callback = function()
+    local opts = { buffer = 0, silent = true }
+    vim.keymap.set('t', '<C-h>', [[<C-\><C-n><C-w>h]], opts)
+    vim.keymap.set('t', '<C-j>', [[<C-\><C-n><C-w>j]], opts)
+    vim.keymap.set('t', '<C-k>', [[<C-\><C-n><C-w>k]], opts)
+    vim.keymap.set('t', '<C-l>', [[<C-\><C-n><C-w>l]], opts)
+  end,
+})
+
+-- Always enter terminal insert mode when switching to a terminal window
+vim.api.nvim_create_autocmd({ 'BufEnter', 'WinEnter' }, {
+  pattern = 'term://*',
+  callback = function()
+    -- Only enter insert mode if we're not already in it
+    if vim.fn.mode() ~= 't' then
+      vim.cmd 'startinsert'
+    end
+  end,
+})
+
+-- gitsigns
+require('gitsigns').setup {
+  on_attach = function(bufnr)
+    local gitsigns = require 'gitsigns'
+
+    local function map(mode, l, r, opts)
+      opts = opts or {}
+      opts.buffer = bufnr
+      vim.keymap.set(mode, l, r, opts)
+    end
+
+    -- Navigation
+    map('n', '<leader>hn', function()
+      if vim.wo.diff then
+        vim.cmd.normal { '<leader>hn', bang = true }
+      else
+        ---@diagnostic disable-next-line: param-type-mismatch
+        gitsigns.nav_hunk 'next'
+      end
+    end, { desc = 'Hunk next' })
+
+    map('n', '<leader>hp', function()
+      if vim.wo.diff then
+        vim.cmd.normal { '<leader>hp', bang = true }
+      else
+        ---@diagnostic disable-next-line: param-type-mismatch
+        gitsigns.nav_hunk 'prev'
+      end
+    end, { desc = 'Hunk previous' })
+
+    -- Actions
+    map('n', '<leader>hs', gitsigns.stage_hunk, { desc = 'Hunk stage' })
+    map('n', '<leader>hr', gitsigns.reset_hunk, { desc = 'Hunk reset' })
+
+    map('v', '<leader>hs', function()
+      gitsigns.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
+    end, { desc = 'Hunk stage' })
+
+    map('v', '<leader>hr', function()
+      gitsigns.reset_hunk { vim.fn.line '.', vim.fn.line 'v' }
+    end, { desc = 'Hunk reset' })
+
+    map('n', '<leader>hS', gitsigns.stage_buffer, { desc = 'Hunk stage buffer' })
+    map('n', '<leader>hR', gitsigns.reset_buffer, { desc = 'Hunk reset buffer' })
+    map('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'Hunk preview' })
+    map('n', '<leader>hi', gitsigns.preview_hunk_inline, { desc = 'Hunk preview inline' })
+
+    map('n', '<leader>hb', function()
+      gitsigns.blame_line { full = true }
+    end, { desc = 'Hunk blame line' })
+
+    map('n', '<leader>hd', gitsigns.diffthis, { desc = 'Hunk diff' })
+
+    map('n', '<leader>hD', function()
+      ---@diagnostic disable-next-line: param-type-mismatch
+      gitsigns.diffthis '~'
+    end, { desc = 'Hunk diff this' })
+
+    map('n', '<leader>hQ', function()
+      ---@diagnostic disable-next-line: param-type-mismatch
+      gitsigns.setqflist 'all'
+    end, { desc = 'Hunk set all qf list' })
+    map('n', '<leader>hq', gitsigns.setqflist, { desc = 'Hunk set qf list' })
+
+    -- Toggles
+    map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = 'Toggle blame line' })
+    map('n', '<leader>tw', gitsigns.toggle_word_diff, { desc = 'Toggle word diff' })
+
+    -- Text object
+    map({ 'o', 'x' }, 'ih', gitsigns.select_hunk, { desc = 'Hunk select' })
+  end,
+}
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
