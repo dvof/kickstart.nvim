@@ -681,7 +681,7 @@ require('lazy').setup({
       local servers = {
         clangd = {},
         -- gopls = {},
-        -- pyright = {},
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -759,7 +759,7 @@ require('lazy').setup({
       },
     },
     opts = {
-      notify_on_error = false,
+      notify_on_error = true,
       format_on_save = function(bufnr)
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
@@ -1027,7 +1027,23 @@ vim.o.tabstop = 4
 vim.o.shiftwidth = 4
 vim.o.expandtab = true
 vim.o.softtabstop = 4
-vim.opt.path:append '**'
+
+-- Current directory (non-recursive)
+vim.opt.path:prepend { '.,', '.' }
+
+-- ~/projects (recursive)
+-- vim.opt.path:append(vim.fn.expand '~/projects' .. '/**')
+
+vim.opt.wildignore:append {
+  '*/.git/*',
+  '*/.pio/*',
+  '*/node_modules/*',
+  '*/dist/*',
+  '*/build/*',
+  '*/target/*',
+  '*/.venv/*',
+  '*/__pycache__/*',
+}
 
 -- Basics
 vim.keymap.set('i', 'jk', '<Esc>', { desc = 'Escape insert mode' })
@@ -1035,6 +1051,9 @@ vim.keymap.set('c', 'jk', '<C-c>', { desc = 'Escape command' })
 vim.keymap.set('n', '<leader><leader>w', ':w<CR>', { desc = 'Write to file' })
 vim.keymap.set('n', '<leader><leader>q', ':q<CR>', { desc = 'Quit' })
 vim.keymap.set('t', '<C-n>', [[<C-\><C-n>]], { desc = 'Enter normal mode in terminal' })
+vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, {
+  desc = 'Show diagnostics (float)',
+})
 
 -- Allow window navigation from terminal mode with <C-h/j/k/l>
 vim.api.nvim_create_autocmd('TermOpen', {
