@@ -987,7 +987,7 @@ require('lazy').setup({
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
@@ -1023,10 +1023,11 @@ require('lazy').setup({
 })
 
 -- [[ My setting options ]]
-vim.o.tabstop = 4
-vim.o.shiftwidth = 4
-vim.o.expandtab = true
-vim.o.softtabstop = 4
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.softtabstop = 4
+vim.opt.expandtab = true
+-- vim.opt.path:append '**'
 
 -- Current directory (non-recursive)
 vim.opt.path:prepend { '.,', '.' }
@@ -1054,6 +1055,7 @@ vim.keymap.set('t', '<C-n>', [[<C-\><C-n>]], { desc = 'Enter normal mode in term
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, {
   desc = 'Show diagnostics (float)',
 })
+vim.keymap.set('n', '<leader>e', '<cmd>Neotree toggle<CR>', { desc = 'Toggle Neo-tree' })
 
 -- Allow window navigation from terminal mode with <C-h/j/k/l>
 vim.api.nvim_create_autocmd('TermOpen', {
