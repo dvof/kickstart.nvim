@@ -1052,7 +1052,7 @@ vim.keymap.set('c', 'jk', '<C-c>', { desc = 'Escape command' })
 vim.keymap.set('n', '<leader><leader>w', ':w<CR>', { desc = 'Write to file' })
 vim.keymap.set('n', '<leader><leader>q', ':q<CR>', { desc = 'Quit' })
 vim.keymap.set('t', '<C-n>', [[<C-\><C-n>]], { desc = 'Enter normal mode in terminal' })
-vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, {
+vim.keymap.set('n', '<leader>d', vim.diagnostic.open_float, {
   desc = 'Show diagnostics (float)',
 })
 vim.keymap.set('n', '<leader>e', '<cmd>Neotree toggle<CR>', { desc = 'Toggle Neo-tree' })
