@@ -1052,10 +1052,14 @@ vim.keymap.set('c', 'jk', '<C-c>', { desc = 'Escape command' })
 vim.keymap.set('n', '<leader><leader>w', ':w<CR>', { desc = 'Write to file' })
 vim.keymap.set('n', '<leader><leader>q', ':q<CR>', { desc = 'Quit' })
 vim.keymap.set('t', '<C-n>', [[<C-\><C-n>]], { desc = 'Enter normal mode in terminal' })
+vim.keymap.set('n', '<leader>e', '<cmd>Neotree toggle<CR>', { desc = 'Toggle Neo-tree' })
 vim.keymap.set('n', '<leader>d', vim.diagnostic.open_float, {
   desc = 'Show diagnostics (float)',
 })
-vim.keymap.set('n', '<leader>e', '<cmd>Neotree toggle<CR>', { desc = 'Toggle Neo-tree' })
+vim.keymap.set('n', '<leader><leader>d', function()
+  local enabled = vim.diagnostic.is_enabled()
+  vim.diagnostic.enable(not enabled)
+end, { desc = 'Toggle diagnostics (global)' })
 
 -- Allow window navigation from terminal mode with <C-h/j/k/l>
 vim.api.nvim_create_autocmd('TermOpen', {
