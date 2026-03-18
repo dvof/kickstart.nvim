@@ -1073,6 +1073,17 @@ vim.api.nvim_create_autocmd('TermOpen', {
   end,
 })
 
+-- Scroll to the bottom of terminal when going to another window (fix llm cli scroll)
+vim.api.nvim_create_autocmd('WinLeave', {
+  callback = function(args)
+    if vim.bo[args.buf].buftype == 'terminal' then
+      vim.api.nvim_buf_call(args.buf, function()
+        vim.cmd 'normal! G'
+      end)
+    end
+  end,
+})
+
 -- Always enter terminal insert mode when switching to a terminal window
 vim.api.nvim_create_autocmd({ 'BufEnter', 'WinEnter' }, {
   pattern = 'term://*',
